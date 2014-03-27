@@ -4,6 +4,7 @@ from flask.ext.sqlalchemy import SQLAlchemy
 from flask.ext.admin.contrib.sqla import ModelView
 from db_create import *
 
+
 app = Flask(__name__)
 
 admin = Admin(app, name="Trekzilla")
