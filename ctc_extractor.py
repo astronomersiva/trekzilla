@@ -218,10 +218,10 @@ class GDataClient(object):
           event = Event( name = document_entry.title.text, category="workshop")
         elif doc_name.find("trek") != -1 or doc_name.find("emperors to javadhu hills") != -1 or doc_name.find("monsoon survival") != -1 or doc_name.find("nagala eastern adventure") != -1 or doc_name.find("venkatagiri") != -1 or doc_name.find("kumbakarai to kodaikanal") != -1 or doc_name.find("hike") != -1:
           event = Event( name = document_entry.title.text, category="trek")
-          if doc_name.find("easy"):
+          if doc_name.find("easy")!=-1:
             event.trek_difficulty = "easy"
-          elif doc_name.find("moderate"):
-            event.trek_difficulty = "moderate"          
+          elif doc_name.find("moderate")!=-1:
+            event.trek_difficulty = "moderate!=-1"          
           else:
             event.trek_difficulty = "difficult"  
         elif doc_name.find("walk of a lifetime")!= -1:  
@@ -232,7 +232,7 @@ class GDataClient(object):
           event = Event( name = document_entry.title.text, category="tree_plantation")
         elif doc_name.find("swimming") != -1 and doc_name.find("camp") != -1:
           event = Event( name = document_entry.title.text, category="swimming_camp")
-          if doc_name.find("beginners"):
+          if doc_name.find("beginners")!=-1:
             event.swimming_level = "beginners"
           else:
             event.swimming_level = "advanced"         
