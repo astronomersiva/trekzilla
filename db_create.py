@@ -39,7 +39,7 @@ class Member(db.Model):
 
 
   def __repr__(self):
-    return self.name + '<' + self.email + '>'
+    return self.email
 
 class Event(db.Model):
 
