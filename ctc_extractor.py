@@ -71,11 +71,11 @@ class XLhelper:
           try:
             for col in range(s.ncols):
               header=str(s.cell(0,col).value).strip().lower()
-              if (header.startswith("name") or header=="full name" or header == "how we suppose to call u?" or header == "my name" or header == "participants") and new_member:
+              if (header.startswith("name") or header=="full name" or header == "how we suppose to call u?" or header == "my name" or header == "participants"):
                 member.name=s.cell(row,col).value 
-              elif header.startswith("gender") and new_member:
+              elif header.startswith("gender"):
                 member.gender = str(s.cell(row,col).value).partition('/')[0].strip()
-              elif header == "Age\gender" and new_member:
+              elif header == "Age\gender":
                 member.gender = str(s.cell(row,col).value).partition('\\')[2].strip()
               elif header == "date of birth" or header == "when we can get treat from u ?":
                 member.dob = str(s.cell(row,col).value)
