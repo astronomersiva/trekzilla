@@ -221,7 +221,7 @@ class GDataClient(object):
           if doc_name.find("easy")!=-1:
             event.trek_difficulty = "easy"
           elif doc_name.find("moderate")!=-1:
-            event.trek_difficulty = "moderate!=-1"          
+            event.trek_difficulty = "moderate"          
           else:
             event.trek_difficulty = "difficult"  
         elif doc_name.find("walk of a lifetime")!= -1:  
