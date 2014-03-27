@@ -4,7 +4,7 @@ from xlrd import open_workbook
 from sqlalchemy import *
 from sqlalchemy.sql import select
 from sqlalchemy.orm import sessionmaker
-from ctcdb_orm import *
+from db_create import *
 import os, traceback, datetime
 import logging
 from config import config
@@ -12,7 +12,9 @@ from config import config
 
 class DBhelper:
      def session(self):
-        return self.sessionmaker()
+        session = self.sessionmaker()
+        session._model_changes= {}
+        return session
 
      def __init__(self,db_type,db_host,db_user,db_password,db_name):
         self.engine=create_engine(db_type+"://"+db_user+":"+db_password+"@"+db_host+"/"+db_name)
@@ -258,6 +260,23 @@ class GDataClient(object):
           session.add(event)
         except:
           logging.exception("could not add event ", event.name)
+
+        acl_query = gdata.docs.service.DocumentAclQuery(document_entry.resourceId.text)
+        acl_feed = self.gd_client.GetDocumentListAclFeed(acl_query.ToUri())
+        owners = [a.scope.value for a in acl_feed.entry if a.role.value == 'owner' ]
+        if len(owners)>0:
+          owner_email=owners[0]
+          if session.query(Member).filter_by(email = owner_email ).count() == 0:
+            session.add(Member(email = owner_email ))
+          owner_member = session.query(Member).filter_by(email = owner_email ).first()
+          event.primary_organizer_id = owner_member.id
+        organizers =  owners + [a.scope.value for a in acl_feed.entry if a.role.value == 'writer' ]
+        for organizer_email in organizers:
+          if session.query(Member).filter_by(email = organizer_email ).count() == 0:
+            session.add(Member(email = organizer_email ))
+          organizer_member = session.query(Member).filter_by(email = organizer_email ).first()
+          event.organizers.append(organizer_member)
+
         try:
           added_event = session.query(Event).filter_by(name = document_entry.title.text ).first()
           added_ws.event = added_event

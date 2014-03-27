@@ -52,10 +52,13 @@ class Event(db.Model):
   end_date = db.Column(db.Date)
   location = db.Column(db.String(length=256, convert_unicode=True))
   trek_difficulty = db.Column(db.String(length=60, convert_unicode=True))
-  swimming_level = db.Column(db.String(length=60, convert_unicode=True))
+  swimming_batch_level = db.Column(db.String(length=60, convert_unicode=True))
+  primary_organizer_id = db.Column(db.Integer,db.ForeignKey("members.id")) 
 
   organizers = db.relationship("Member", secondary = event_organizers_table, backref="organized_events")
   #trek = relationship("Trek", uselist=False, backref="event")
+
+  primary_organizer = db.relationship("Member", backref="events_as_primary_organizer" )
 
   def __repr__(self):
     return self.name
