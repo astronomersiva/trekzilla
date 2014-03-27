@@ -7,14 +7,15 @@ from sqlalchemy.orm import sessionmaker
 from ctcdb_orm import *
 import os, traceback, datetime
 import logging
+from config import config
 
 
 class DBhelper:
      def session(self):
         return self.sessionmaker()
 
-     def __init__(self,db_type,db_host,db_member,db_password,db_name):
-        self.engine=create_engine(db_type+"://"+db_member+":"+db_password+"@"+db_host+"/"+db_name)
+     def __init__(self,db_type,db_host,db_user,db_password,db_name):
+        self.engine=create_engine(db_type+"://"+db_user+":"+db_password+"@"+db_host+"/"+db_name)
         self.metadata=MetaData()
         self.sessionmaker = sessionmaker(bind=self.engine)     
         
@@ -156,10 +157,19 @@ class GDataClient(object):
   
   def __init__(self,email,password,dbhelper):
     self.gd_client = gdata.docs.service.DocsService()
-    self.gd_client.ClientLogin(email, password)
-
     self.gs_client = gdata.spreadsheet.service.SpreadsheetsService()
-    self.gs_client.ClientLogin(email, password)
+    for tries in range(10):
+      try:
+        self.gd_client.ClientLogin(email, password)   
+        break
+      except:
+        logging.critical("Trying to do client login again")
+    for tries in range(10):
+      try:
+        self.gs_client.ClientLogin(email, password)
+        break
+      except:
+        logging.critical("Trying to do client login again")        
 
     self.dbhelper = dbhelper
 
@@ -228,7 +238,7 @@ class GDataClient(object):
             event.swimming_level = "advanced"         
         elif filename.find("coastalcleanup") != -1:
           event = Event( name = document_entry.title.text, category="coastal_cleanup")
-        elif filename.find("marathon") != -1 or filename.find("completed_attendees"):
+        elif filename.find("marathon") != -1 or filename.find("completed_attendees")!=-1:
           event = Event( name = document_entry.title.text, category="marathon")
         elif filename.find("triathlon") != -1:
           event = Event( name = document_entry.title.text, category="triathlon")
@@ -258,9 +268,9 @@ class GDataClient(object):
 
 def main():
   logging.basicConfig(filename = "ctc.log", level=logging.DEBUG)
-  xlpath='/home/surya/workspace/python/ctc/'
-  dbhelper=DBhelper(db_type="mysql",db_host="localhost",db_member="admin",db_password="admin",db_name="ctc")
-  gdclient=GDataClient("ctctrekkers@gmail.com","nagala123",dbhelper)
+  xlpath=config.XL_PATH
+  dbhelper=DBhelper(db_type=config.DBTYPE,db_host=config.DBHOST,db_user=config.DBUSER,db_password=config.DBPASSWD,db_name=config.DBNAME)
+  gdclient=GDataClient(config.CTC_EMAIL,config.CTC_EMAIL_PASSWORD,dbhelper)
   gdclient.downloadSpreadSheets(xlpath)
 
   spreadsheet_files = os.listdir(xlpath)
