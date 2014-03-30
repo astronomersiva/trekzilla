@@ -56,7 +56,7 @@ class XLhelper:
           session=dbhelper.session()
           logging.info("Associated event id is ", associated_event_id)
           registration = Registration( event_id = associated_event_id )
-          loggin.info(" Initializing registration with event id ",registration.event_id)
+          logging.info(" Initializing registration with event id ",registration.event_id)
           if self.email_regex.search(s.cell(row,email_col).value) is None:
             continue
           try:
@@ -97,32 +97,32 @@ class XLhelper:
                 member.id_proof_number = str(s.cell(row,col).value)
               elif( header=="profile link" or header=="profile" or header.find("fb")!=-1 or header.find("social network")!=-1 or header.find("facebook")!=-1 or header.find("social network")!=-1):
                 if member.fb_profile==None:
-                  member.fb_profile=str(s.cell(row,col).value)
+                  member.fb_profile=s.cell(row,col).value
               elif header.find("contact")!=-1 or header.find("mobile")!=-1 or header.find("phone")!=-1:
                 member.contact=s.cell(row,col).value
               elif header == "emergency contact person":
                 member.emergency_contact_person = str(s.cell(row,col).value)
               elif (header.find("contact")!=-1 or header.find("mobile")!=-1) and header.find("emergency")!=-1:
                 if(header.find("blood group")==-1):
-                  member.emergency_contact = str(s.cell(row,col).value)
+                  member.emergency_contact = s.cell(row,col).value
                 else:
-                  m=self.bloodgroup_contact_regex.match(str(s.cell(row,col).value))
+                  m=self.bloodgroup_contact_regex.match(s.cell(row,col).value)
                   member.bloodgroup=m.group(1)
                   member.emergency_contact = m.group(2)
               elif header.startswith("swimming"):
                 member.swimming_ability = s.cell(row,col).value
               elif header.find("camera") != -1 and header.find("you own")!=-1 :
-                member.camera_model = str(s.cell(row,col).value)
+                member.camera_model = s.cell(row,col).value
               elif header.find("bike")!=-1 and header.find("model")!=-1 :
-                member.bike_model = str(s.cell(row,col).value)
+                member.bike_model = s.cell(row,col).value
               elif header.find("cycle")!=-1 and header.find("model")!=-1 :
-                member.cycle_model = str(s.cell(row,col).value)
+                member.cycle_model = s.cell(row,col).value
               elif header.find("cycle")!=-1 and header.find("type")!=-1 :
-                member.cycle_type = str(s.cell(row,col).value)
+                member.cycle_type = s.cell(row,col).value
               elif header.startswith("bike registration number"):
-                member.bike_registration_number = str(s.cell(row,col).value)
+                member.bike_registration_number = s.cell(row,col).value
               elif header.find("blood group")!=-1 and header.find("blood group of your all participants")==-1:
-                member.bloodgroup= str(s.cell(row,col).value)
+                member.bloodgroup= s.cell(row,col).value
               elif(header.startswith("joining at") or header =="i will join @" or header == "joining location" or header=="assembling point" or header == "pickup point" or header == "where would u like to join with us ?" or header.startswith("boarding")):
                 registration.joining_at = s.cell(row,col).value
               elif header == "timestamp":
