@@ -55,11 +55,9 @@ class XLhelper:
            return
         for row in range(1,s.nrows):
           session=dbhelper.session()
-          print "starting row"
           logging.info("Associated event id is " + str(associated_event_id))
           registration = Registration( event_id = associated_event_id )
           logging.info(" Initializing registration with event id "+ str(registration.event_id))
-          print "Initializing registration with event id "+ str(registration.event_id)
           if self.email_regex.search(s.cell(row,email_col).value) is None:
             continue
           try:
@@ -242,7 +240,7 @@ class GDataClient(object):
           continue
         added_ws = session.query(Worksheet).filter_by(gdata_resourceId = document_entry.resourceId.text ).first()
         doc_name = document_entry.title.text.lower()
-        event_name = document_entry.title.text.strip().strip("(Responses)").strip()
+        event_name = document_entry.title.text
         if doc_name.find("workshop") != -1 or doc_name.find("trek polamaa") != -1:
           event = Event( name = document_entry.title.text, category="workshop")
         elif doc_name.find("trek") != -1 or doc_name.find("emperors to javadhu hills") != -1 or doc_name.find("monsoon survival") != -1 or doc_name.find("nagala eastern adventure") != -1 or doc_name.find("venkatagiri") != -1 or doc_name.find("kumbakarai to kodaikanal") != -1 or doc_name.find("hike") != -1:
@@ -308,7 +306,7 @@ class GDataClient(object):
         """
 
         try:
-          added_event = session.query(Event).filter_by(name = document_entry.title.text.strip().strip("(Responses)").strip() ).first()
+          added_event = session.query(Event).filter_by(name = document_entry.title.text ).first()
           added_ws.event = added_event
           session.commit()  
         except:
