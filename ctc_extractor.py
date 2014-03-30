@@ -39,7 +39,6 @@ class XLhelper:
         try:
           associated_event_id=session.query(Worksheet).filter_by(filename = file_name ).first().event_id
           logging.info("Found Associated event id is "+str( associated_event_id))
-          print "Found Associated event id is "+str( associated_event_id)
         except:
           logging.error("Exception while fetching associated event id for "+str(file_name))
           associated_event_id=None
@@ -55,7 +54,6 @@ class XLhelper:
            return
         for row in range(1,s.nrows):
           session=dbhelper.session()
-          logging.info("Associated event id is " + str(associated_event_id))
           registration = Registration( event_id = associated_event_id )
           logging.info(" Initializing registration with event id "+ str(registration.event_id))
           if self.email_regex.search(s.cell(row,email_col).value) is None:
