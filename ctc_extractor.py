@@ -8,6 +8,7 @@ from db_create import *
 import os, traceback, datetime
 import logging
 from config import config
+import re
 
 
 class DBhelper:
@@ -22,6 +23,11 @@ class DBhelper:
         self.sessionmaker = sessionmaker(bind=self.engine)     
         
 class XLhelper:
+
+    def __init__(self):
+      self.email_regex=re.compile("\S+@\S+.\S")
+      self.bloodgroup_contact_regex=re.compile("([a-zA-z+]*)\s*([0-9]*)")
+
     def openbook(self,file_name,dbhelper):
       try:
         wb = open_workbook(file_name)
@@ -32,6 +38,7 @@ class XLhelper:
         session=dbhelper.session()
         try:
           associated_event_id=session.query(Worksheet).filter_by(filename = file_name ).first().event_id
+          logging.info("Found Associated event id is ", associated_event_id)
         except:
           logging.error("Exception while fetching associated event id for "+str(file_name))
           associated_event_id=None
@@ -46,8 +53,12 @@ class XLhelper:
            logging.info( "No email column so returning without doing anything for file "+str(file_name) )
            return
         for row in range(1,s.nrows):
-          #session=dbhelper.session()
+          session=dbhelper.session()
+          logging.info("Associated event id is ", associated_event_id)
           registration = Registration( event_id = associated_event_id )
+          loggin.info(" Initializing registration with event id ",registration.event_id)
+          if self.email_regex.search(s.cell(row,email_col).value) is None:
+            continue
           try:
             member_count = session.query(Member).filter_by(email = s.cell(row,email_col).value ).count()
           except:
@@ -72,7 +83,8 @@ class XLhelper:
             for col in range(s.ncols):
               header=str(s.cell(0,col).value).strip().lower()
               if (header.startswith("name") or header=="full name" or header == "how we suppose to call u?" or header == "my name" or header == "participants"):
-                member.name=s.cell(row,col).value 
+                if member.name==None:
+                   member.name=s.cell(row,col).value 
               elif header.startswith("gender"):
                 member.gender = str(s.cell(row,col).value).partition('/')[0].strip()
               elif header == "Age\gender":
@@ -84,13 +96,19 @@ class XLhelper:
               elif header == "id proof number":
                 member.id_proof_number = str(s.cell(row,col).value)
               elif( header=="profile link" or header=="profile" or header.find("fb")!=-1 or header.find("social network")!=-1 or header.find("facebook")!=-1 or header.find("social network")!=-1):
-                member.fb_profile=str(s.cell(row,col).value)
-              elif(header.find("contact")!=-1 or header.find("mobile")!=-1):
+                if member.fb_profile==None:
+                  member.fb_profile=str(s.cell(row,col).value)
+              elif header.find("contact")!=-1 or header.find("mobile")!=-1 or header.find("phone")!=-1:
                 member.contact=s.cell(row,col).value
-              elif (header.find("contact")!=-1 or header.find("mobile")!=-1) and header.find("emergency")!=-1:
-                member.emergency_contact = str(s.cell(row,col).value)
               elif header == "emergency contact person":
                 member.emergency_contact_person = str(s.cell(row,col).value)
+              elif (header.find("contact")!=-1 or header.find("mobile")!=-1) and header.find("emergency")!=-1:
+                if(header.find("blood group")==-1):
+                  member.emergency_contact = str(s.cell(row,col).value)
+                else:
+                  m=self.bloodgroup_contact_regex.match(str(s.cell(row,col).value))
+                  member.bloodgroup=m.group(1)
+                  member.emergency_contact = m.group(2)
               elif header.startswith("swimming"):
                 member.swimming_ability = s.cell(row,col).value
               elif header.find("camera") != -1 and header.find("you own")!=-1 :
@@ -135,6 +153,7 @@ class XLhelper:
               except:
                 logging.exception("Error while adding member ",member.id)
                 traceback.print_exc() 
+                session.rollback()
                 continue
           except:
                 logging.exception("Error while header loop for " + str(header) + " for "+ str(member.id) +":"+ str(member.name) +" in "+ str(file_name))
@@ -150,7 +169,8 @@ class XLhelper:
             session.add(registration)
             session.commit()
           except:
-              logging.exception("Error while adding registration " + str(registration.id ))
+            logging.exception("Error while adding registration " + str(registration.id )+ " for file "+file_name)
+            session.rollback()
       except:
         logging.exception( "Error in "+file_name  )  
 
@@ -212,14 +232,18 @@ class GDataClient(object):
         session=self.dbhelper.session()
         try:
           session.add(worksheet)
+          session.commit()
         except:
           logging.exception( "Exception while adding worksheet to db ", workseeth.name)
+          session.rollback()
+          continue
         added_ws = session.query(Worksheet).filter_by(gdata_resourceId = document_entry.resourceId.text ).first()
         doc_name = document_entry.title.text.lower()
+        event_name = document_entry.title.text.strip().strip("(Responses)").strip()
         if doc_name.find("workshop") != -1 or doc_name.find("trek polamaa") != -1:
           event = Event( name = document_entry.title.text, category="workshop")
         elif doc_name.find("trek") != -1 or doc_name.find("emperors to javadhu hills") != -1 or doc_name.find("monsoon survival") != -1 or doc_name.find("nagala eastern adventure") != -1 or doc_name.find("venkatagiri") != -1 or doc_name.find("kumbakarai to kodaikanal") != -1 or doc_name.find("hike") != -1:
-          event = Event( name = document_entry.title.text, category="trek")
+          event = Event( name = event_name, category="trek")
           if doc_name.find("easy")!=-1:
             event.trek_difficulty = "easy"
           elif doc_name.find("moderate")!=-1:
@@ -227,35 +251,35 @@ class GDataClient(object):
           else:
             event.trek_difficulty = "difficult"  
         elif doc_name.find("walk of a lifetime")!= -1:  
-            event = Event( name = document_entry.title.text, category="walk")
+            event = Event( name = event_name, category="walk")
         elif doc_name.find("photography") != -1:
-          event = Event( name = document_entry.title.text, category="photography_trip")      
+          event = Event( name = event_name, category="photography_trip")      
         elif (doc_name.find("tree")!=-1 and doc_name.find("plantation") != -1) or (doc_name.find("seed")!=-1 and doc_name.find("sowing")!=-1 ):
-          event = Event( name = document_entry.title.text, category="tree_plantation")
+          event = Event( name = event_name, category="tree_plantation")
         elif doc_name.find("swimming") != -1 and doc_name.find("camp") != -1:
-          event = Event( name = document_entry.title.text, category="swimming_camp")
+          event = Event( name = event_name, category="swimming_camp")
           if doc_name.find("beginners")!=-1:
             event.swimming_level = "beginners"
           else:
             event.swimming_level = "advanced"         
         elif filename.find("coastalcleanup") != -1:
-          event = Event( name = document_entry.title.text, category="coastal_cleanup")
+          event = Event( name = event_name, category="coastal_cleanup")
         elif filename.find("marathon") != -1 or filename.find("completed_attendees")!=-1:
-          event = Event( name = document_entry.title.text, category="marathon")
+          event = Event( name = event_name, category="marathon")
         elif filename.find("triathlon") != -1:
-          event = Event( name = document_entry.title.text, category="triathlon")
+          event = Event( name = event_name, category="triathlon")
         elif filename.find("workshop") != -1:
-          event = Event( name = document_entry.title.text, category="workshop")
+          event = Event( name = event_name, category="workshop")
         elif filename.find("bike") != -1 or filename.find("bikers")!= -1 or filename.find("biking") != -1 or filename.find("ride") != -1 or filename.find("biketrip") != -1:
-          event = Event( name = document_entry.title.text, category="bike_ride")
+          event = Event( name = event_name, category="bike_ride")
         elif filename.find("dailyrunning") != -1:
-          event = Event( name = document_entry.title.text, category="daily_running")
+          event = Event( name = event_name, category="daily_running")
         elif filename.find("cycling") != -1 or filename.find("cycletrip") != -1:
-          event = Event( name = document_entry.title.text, category="cycling")
+          event = Event( name = event_name, category="cycling")
         elif filename.find("farmvisit") != -1:
-          event = Event( name = document_entry.title.text, category="farm_visit")
+          event = Event( name = event_name, category="farm_visit")
         else:   
-          event = Event( name = document_entry.title.text )
+          event = Event( name = event_name )
         try:
           session.add(event)
         except:
@@ -269,13 +293,16 @@ class GDataClient(object):
           if session.query(Member).filter_by(email = owner_email ).count() == 0:
             session.add(Member(email = owner_email ))
           owner_member = session.query(Member).filter_by(email = owner_email ).first()
+          owner_member.is_organizer=True
           event.primary_organizer_id = owner_member.id
+        """
         organizers =  owners + [a.scope.value for a in acl_feed.entry if a.role.value == 'writer' ]
         for organizer_email in organizers:
           if session.query(Member).filter_by(email = organizer_email ).count() == 0:
             session.add(Member(email = organizer_email ))
           organizer_member = session.query(Member).filter_by(email = organizer_email ).first()
           event.organizers.append(organizer_member)
+        """
 
         try:
           added_event = session.query(Event).filter_by(name = document_entry.title.text ).first()
@@ -283,6 +310,7 @@ class GDataClient(object):
           session.commit()  
         except:
           logging.exception("error while adding event to worksheet ", added_ws.name)
+          session.rollback()
 
 
 def main():

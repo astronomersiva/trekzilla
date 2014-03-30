@@ -16,7 +16,7 @@ class Member(db.Model):
 
   id = db.Column(db.Integer,primary_key=True)
   name = db.Column(db.String(length=256, convert_unicode=True))
-  is_organizer = db.Column(db.Boolean)
+  is_organizer = db.Column(db.Boolean,default=False)
   gender = db.Column(db.String(length=16, convert_unicode=True))
   age = db.Column(db.Integer)
   dob = db.Column(db.String(length=256, convert_unicode=True))
@@ -36,6 +36,11 @@ class Member(db.Model):
   cycle_type = db.Column(db.String(length=60, convert_unicode=True))
   cycle_model = db.Column(db.String(length=256, convert_unicode=True))
   tshirt_size = db.Column(db.String(length=16, convert_unicode=True))
+
+  def __init__(self,email,name=None,fb_profile=None):
+    self.email=email
+    self.name=name
+    self.fb_profile=fb_profile
 
 
   def __repr__(self):
