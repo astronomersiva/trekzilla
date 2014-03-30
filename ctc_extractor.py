@@ -38,7 +38,8 @@ class XLhelper:
         session=dbhelper.session()
         try:
           associated_event_id=session.query(Worksheet).filter_by(filename = file_name ).first().event_id
-          logging.info("Found Associated event id is ", associated_event_id)
+          logging.info("Found Associated event id is "+str( associated_event_id))
+          print "Found Associated event id is "+str( associated_event_id)
         except:
           logging.error("Exception while fetching associated event id for "+str(file_name))
           associated_event_id=None
@@ -54,9 +55,11 @@ class XLhelper:
            return
         for row in range(1,s.nrows):
           session=dbhelper.session()
+          print "starting row"
           logging.info("Associated event id is ", associated_event_id)
           registration = Registration( event_id = associated_event_id )
-          logging.info(" Initializing registration with event id ",registration.event_id)
+          logging.info(" Initializing registration with event id "+ str(registration.event_id))
+          print " Initializing registration with event id "+ str(registration.event_id)
           if self.email_regex.search(s.cell(row,email_col).value) is None:
             continue
           try:
@@ -128,7 +131,7 @@ class XLhelper:
               elif header == "timestamp":
                 registration.datetime = str(s.cell(row,col).value)
               elif header == "payment":
-                registration.payment_status = str(s.cell(row,col).value)
+                registration.payment_status = s.cell(row,col).value
               elif header == "organizer's comment":
                 registration.final_organizer_comments = str(s.cell(row,col).value)
               elif header.startswith("coming as"):
