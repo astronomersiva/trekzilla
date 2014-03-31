@@ -13,13 +13,11 @@ class CalendarClient:
       print '\t%s. %s' % (i, a_calendar.title.text,)
       print a_calendar.content.src
       
-      
-      feed = self.cal_client.GetCalendarEventFeed(a_calendar.content.src)
+      query = gdata.calendar.client.CalendarEventQuery(start_min='2004-01-01', start_max='2034-01-01'
+      feed = self.cal_client.GetCalendarEventFeed(a_calendar.content.src,q=query)
       print 'Events on Calendar: %s' % (feed.title.text,)
-      while feed is not None:
-        for i, an_event in zip(xrange(len(feed.entry)), feed.entry):
-          print '\t%s. %s' % (i, an_event.title.text,)
-        feed = self.cal_client.GetCalendarEventFeed(feed.GetNextLink().href)
+      for i, an_event in zip(xrange(len(feed.entry)), feed.entry):
+        print '\t%s. %s' % (i, an_event.title.text,)
 
   
 
