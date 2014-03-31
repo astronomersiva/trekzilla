@@ -241,14 +241,23 @@ class GDataClient(object):
         event_name = document_entry.title.text
         if doc_name.find("workshop") != -1 or doc_name.find("trek polamaa") != -1:
           event = Event( name = document_entry.title.text, category="workshop")
-        elif doc_name.find("trek") != -1 or doc_name.find("emperors to javadhu hills") != -1 or doc_name.find("monsoon survival") != -1 or doc_name.find("nagala eastern adventure") != -1 or doc_name.find("venkatagiri") != -1 or doc_name.find("kumbakarai to kodaikanal") != -1 or doc_name.find("hike") != -1:
+        elif doc_name.find("treasure hunt") != -1:
+          event = Event( name = document_entry.title.text, category="treasure_hunt")
+        elif doc_name.find("trek") != -1 or doc_name.find("emperors to javadhu hills") != -1 or doc_name.find("monsoon survival") != -1 or doc_name.find("nagala") != -1 or doc_name.find("venkatagiri") != -1 or doc_name.find("kumbakarai to kodaikanal") != -1 or doc_name.find("hike") != -1 or doc_name.find("nagari") != -1:
           event = Event( name = event_name, category="trek")
           if doc_name.find("easy")!=-1:
             event.trek_difficulty = "easy"
           elif doc_name.find("moderate")!=-1:
             event.trek_difficulty = "moderate"          
           else:
-            event.trek_difficulty = "difficult"  
+            event.trek_difficulty = "difficult"
+        elif doc_name.find("walk") != -1:
+          if doc_name.find("bird") !=-1:
+            event = Event( name = event_name, category="bird_watching")
+          elif doc_name.find("snake") != -1:
+            event = Event( name = event_name, category="snake_watching")
+          else:
+            event = Event( name = event_name, category="walk")           
         elif doc_name.find("walk of a lifetime")!= -1:  
             event = Event( name = event_name, category="walk")
         elif doc_name.find("photography") != -1:
@@ -269,7 +278,7 @@ class GDataClient(object):
           event = Event( name = event_name, category="triathlon")
         elif filename.find("workshop") != -1:
           event = Event( name = event_name, category="workshop")
-        elif filename.find("bike") != -1 or filename.find("bikers")!= -1 or filename.find("biking") != -1 or filename.find("ride") != -1 or filename.find("biketrip") != -1:
+        elif filename.find("bike") != -1 or filename.find("bikers")!= -1 or filename.find("biking") != -1 or filename.find("ride") != -1 or filename.find("biketrip") != -1 or doc_name.find("kick start") != -1:
           event = Event( name = event_name, category="bike_ride")
         elif filename.find("dailyrunning") != -1:
           event = Event( name = event_name, category="daily_running")
