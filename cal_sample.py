@@ -13,16 +13,15 @@ class CalendarClient:
       print '\t%s. %s' % (i, a_calendar.title.text,)
       print dir(a_calendar)
       
-      print a_calendar.GetFeedLink()
-    feed = self.cal_client.GetCalendarEventFeed()
-    print 'Events on Primary Calendar: %s' % (feed.title.text,)
-    for i, an_event in zip(xrange(len(feed.entry)), feed.entry):
-      print '\t%s. %s' % (i, an_event.title.text,)
-      for p, a_participant in zip(xrange(len(an_event.who)), an_event.who):
-        print '\t\t%s. %s' % (p, a_participant.email,)
-        print '\t\t\t%s' % (a_participant.value,)
-        if a_participant.attendee_status:
-          print '\t\t\t%s' % (a_participant.attendee_status.value,)
+      feed = self.cal_client.GetCalendarEventFeed(a_calendar.content.src)
+      print 'Events on Calendar: %s' % (feed.title.text,)
+      for i, an_event in zip(xrange(len(feed.entry)), feed.entry):
+        print '\t%s. %s' % (i, an_event.title.text,)
+        for p, a_participant in zip(xrange(len(an_event.who)), an_event.who):
+          print '\t\t%s. %s' % (p, a_participant.email,)
+          print '\t\t\t%s' % (a_participant.value,)
+          if a_participant.attendee_status:
+            print '\t\t\t%s' % (a_participant.attendee_status.value,)
   
 
 if __name__ == '__main__':
