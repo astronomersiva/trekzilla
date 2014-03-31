@@ -12,7 +12,8 @@ class CalendarClient:
     for i, a_calendar in zip(xrange(len(feed.entry)), feed.entry):
       print '\t%s. %s' % (i, a_calendar.title.text,)
       print dir(a_calendar)
-      print a_calendar.find_url
+      print a_calendar.FindUrl()
+      print a_calendar.FindChildren()
     feed = self.cal_client.GetCalendarEventFeed()
     print 'Events on Primary Calendar: %s' % (feed.title.text,)
     for i, an_event in zip(xrange(len(feed.entry)), feed.entry):
