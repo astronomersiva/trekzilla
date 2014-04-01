@@ -81,7 +81,7 @@ class XLhelper:
           try:
             for col in range(s.ncols):
               header=str(s.cell(0,col).value).strip().lower()
-              if (header.startswith("name") or header=="full name" or header == "how we suppose to call u?" or header == "my name" or header == "participants") or header=="your name" or header=="your official name":
+              if header.startswith("name") or header=="full name" or header == "how we suppose to call u?" or header == "my name" or header == "participants" or header.find("your name")!=-1 or header.find("your official name")!=-1:
                 if member.name==None:
                    member.name=s.cell(row,col).value 
               elif header.startswith("gender"):
