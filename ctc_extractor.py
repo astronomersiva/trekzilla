@@ -81,7 +81,7 @@ class XLhelper:
           try:
             for col in range(s.ncols):
               header=str(s.cell(0,col).value).strip().lower()
-              if (header.startswith("name") or header=="full name" or header == "how we suppose to call u?" or header == "my name" or header == "participants"):
+              if (header.startswith("name") or header=="full name" or header == "how we suppose to call u?" or header == "my name" or header == "participants") or header=="your name" or header=="your official name":
                 if member.name==None:
                    member.name=s.cell(row,col).value 
               elif header.startswith("gender"):
@@ -98,7 +98,8 @@ class XLhelper:
                 if member.fb_profile==None:
                   member.fb_profile=s.cell(row,col).value
               elif header.find("contact")!=-1 or header.find("mobile")!=-1 or header.find("phone")!=-1:
-                member.contact=s.cell(row,col).value
+                if member.contact==None:
+                  member.contact=s.cell(row,col).value
               elif header == "emergency contact person":
                 member.emergency_contact_person = str(s.cell(row,col).value)
               elif (header.find("contact")!=-1 or header.find("mobile")!=-1) and header.find("emergency")!=-1:
@@ -243,7 +244,7 @@ class GDataClient(object):
           event = Event( name = document_entry.title.text, category="workshop")
         elif doc_name.find("treasure hunt") != -1:
           event = Event( name = document_entry.title.text, category="treasure_hunt")
-        elif doc_name.find("trek") != -1 or doc_name.find("emperors to javadhu hills") != -1 or doc_name.find("mission")!=-1 or doc_name.find("monsoon survival") != -1 or doc_name.find("nagala") != -1 or doc_name.find("venkatagiri") != -1 or doc_name.find("kumbakarai to kodaikanal") != -1 or doc_name.find("hike") != -1 or doc_name.find("nagari") != -1 or doc_name.find("venkateswara")!=-1 or doc_name.find("ombattu gudda")!=-1 or doc_name.find("wild west")!=-1:
+        elif doc_name.find("trek") != -1 or doc_name.find("emperors to javadhu hills") != -1 or doc_name.find("mission")!=-1 or doc_name.find("monsoon survival") != -1 or doc_name.find("nagala") != -1 or doc_name.find("venkatagiri") != -1 or doc_name.find("kumbakarai to kodaikanal") != -1 or doc_name.find("hike") != -1 or doc_name.find("nagari") != -1 or doc_name.find("venkateswara")!=-1 or doc_name.find("ombatu gudda")!=-1 or doc_name.find("wild west")!=-1:
           if doc_name.find("social")!=-1:
             event = Event( name = event_name, category="social_trek")
           else:
