@@ -89,7 +89,7 @@ class XLhelper:
 								if value.find("female")!=-1:
 									member.gender='female'
 								elif value.find("male")!=-1:
-									member.gender='female'
+									member.gender='male'
 								else:
 									member.gender=None
               elif header == "date of birth" or header == "when we can get treat from u ?":
