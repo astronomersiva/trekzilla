@@ -84,10 +84,14 @@ class XLhelper:
               if header.startswith("name") or header=="full name" or header == "how we suppose to call u?" or header == "my name" or header == "participants" or header.find("your name")!=-1 or header.find("your official name")!=-1:
                 if member.name==None:
                    member.name=s.cell(row,col).value 
-              elif header.startswith("gender"):
-                member.gender = str(s.cell(row,col).value).partition('/')[0].strip()
-              elif header == "Age\gender":
-                member.gender = str(s.cell(row,col).value).partition('\\')[2].strip()
+              elif header.find("gender")!=-1:
+								value=s.cell(row,col).value
+								if value.find("female")!=-1:
+									member.gender='female'
+								elif value.find("male")!=-1:
+									member.gender='female'
+								else:
+									member.gender=None
               elif header == "date of birth" or header == "when we can get treat from u ?":
                 member.dob = str(s.cell(row,col).value)
               elif header == "id proof":
