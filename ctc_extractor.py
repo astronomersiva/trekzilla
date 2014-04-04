@@ -86,9 +86,9 @@ class XLhelper:
                    member.name=s.cell(row,col).value 
               elif header.find("gender")!=-1:
 								value=str(s.cell(row,col).value)
-								if value.find("female")!=-1:
+								if value.lower().find("female")!=-1 or value.find("F")!=-1:
 									member.gender='female'
-								elif value.find("male")!=-1:
+								elif value.find("male")!=-1 or value.find("M")!=-1:
 									member.gender='male'
 								else:
 									member.gender=None
