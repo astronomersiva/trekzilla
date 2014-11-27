@@ -11,7 +11,7 @@ import re
 
 class Config:
   CTC_EMAIL="ctctrekkers@gmail.com"
-  CTC_EMAIL_PASSWORD="nagala123"
+  CTC_EMAIL_PASSWORD="CTC password here"
   DBTYPE="mysql"
   DBHOST="localhost"
   DBUSER="admin"
