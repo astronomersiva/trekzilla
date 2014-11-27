@@ -1,0 +1,1 @@
+Run ctc_extractor.py after updating the class Config inside it

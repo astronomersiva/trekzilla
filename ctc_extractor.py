@@ -7,9 +7,17 @@ from sqlalchemy.orm import sessionmaker
 from db_create import *
 import os, traceback, datetime
 import logging
-from config import config
 import re
 
+class Config:
+  CTC_EMAIL="ctctrekkers@gmail.com"
+  CTC_EMAIL_PASSWORD="nagala123"
+  DBTYPE="mysql"
+  DBHOST="localhost"
+  DBUSER="admin"
+  DBPASSWD="admin"
+  DBNAME="ctc"
+  XL_PATH="./ctc_xlfiles/"
 
 class DBhelper:
      def session(self):
@@ -339,9 +347,9 @@ class GDataClient(object):
 
 def main():
   logging.basicConfig(filename = "ctc.log", level=logging.DEBUG)
-  xlpath=config.XL_PATH
-  dbhelper=DBhelper(db_type=config.DBTYPE,db_host=config.DBHOST,db_user=config.DBUSER,db_password=config.DBPASSWD,db_name=config.DBNAME)
-  gdclient=GDataClient(config.CTC_EMAIL,config.CTC_EMAIL_PASSWORD,dbhelper)
+  xlpath=Config.XL_PATH
+  dbhelper=DBhelper(db_type=Config.DBTYPE,db_host=Config.DBHOST,db_user=Config.DBUSER,db_password=Config.DBPASSWD,db_name=Config.DBNAME)
+  gdclient=GDataClient(Config.CTC_EMAIL,Config.CTC_EMAIL_PASSWORD,dbhelper)
   gdclient.downloadSpreadSheets(xlpath)
 
   spreadsheet_files = os.listdir(xlpath)
